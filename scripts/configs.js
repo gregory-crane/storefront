@@ -13,12 +13,14 @@ export const calcEnvironment = () => {
   if (href.includes('.hlx.page')) {
     environment = 'stage';
   }
-  if (href.includes('localhost')) {
-    environment = 'dev';
-  }
+  environment = 'dev';
 
   const environmentFromConfig = window.sessionStorage.getItem('environment');
-  if (environmentFromConfig && ALLOWED_CONFIGS.includes(environmentFromConfig) && environment !== 'prod') {
+  if (
+    environmentFromConfig &&
+    ALLOWED_CONFIGS.includes(environmentFromConfig) &&
+    environment !== 'prod'
+  ) {
     return environmentFromConfig;
   }
 

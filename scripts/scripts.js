@@ -44,14 +44,19 @@ const AUDIENCES = {
  * @returns an array of HTMLElement nodes that match the given scope
  */
 export function getAllMetadata(scope) {
-  return [...document.head.querySelectorAll(`meta[property^="${scope}:"],meta[name^="${scope}-"]`)]
-    .reduce((res, meta) => {
-      const id = toClassName(meta.name
+  return [
+    ...document.head.querySelectorAll(
+      `meta[property^="${scope}:"],meta[name^="${scope}-"]`
+    ),
+  ].reduce((res, meta) => {
+    const id = toClassName(
+      meta.name
         ? meta.name.substring(scope.length + 1)
-        : meta.getAttribute('property').split(':')[1]);
-      res[id] = meta.getAttribute('content');
-      return res;
-    }, {});
+        : meta.getAttribute('property').split(':')[1]
+    );
+    res[id] = meta.getAttribute('content');
+    return res;
+  }, {});
 }
 
 // Define an execution context
@@ -73,7 +78,11 @@ function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+  if (
+    h1 &&
+    picture &&
+    h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING
+  ) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
     main.prepend(section);
@@ -86,7 +95,8 @@ function buildHeroBlock(main) {
 async function loadFonts() {
   await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
   try {
-    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+    if (!window.location.hostname.includes('localhost'))
+      sessionStorage.setItem('fonts-loaded', 'true');
   } catch (e) {
     // do nothing
   }
@@ -113,7 +123,7 @@ function buildAutoBlocks(main) {
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
-  decorateIcons(main);
+  //decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
@@ -138,11 +148,15 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
 
   // Instrument experimentation plugin
-  if (getMetadata('experiment')
-    || Object.keys(getAllMetadata('campaign')).length
-    || Object.keys(getAllMetadata('audience')).length) {
+  if (
+    getMetadata('experiment') ||
+    Object.keys(getAllMetadata('campaign')).length ||
+    Object.keys(getAllMetadata('audience')).length
+  ) {
     // eslint-disable-next-line import/no-relative-packages
-    const { loadEager: runEager } = await import('../plugins/experimentation/src/index.js');
+    const { loadEager: runEager } = await import(
+      '../plugins/experimentation/src/index.js'
+    );
     await runEager(document, { audiences: AUDIENCES }, pluginContext);
   }
 
@@ -154,7 +168,10 @@ async function loadEager(doc) {
     const sku = getSkuFromUrl();
     window.getProductPromise = getProduct(sku);
 
-    preloadFile('/scripts/__dropins__/storefront-pdp/containers/ProductDetails.js', 'script');
+    preloadFile(
+      '/scripts/__dropins__/storefront-pdp/containers/ProductDetails.js',
+      'script'
+    );
     preloadFile('/scripts/__dropins__/storefront-pdp/api.js', 'script');
     preloadFile('/scripts/__dropins__/storefront-pdp/render.js', 'script');
     preloadFile('/scripts/__dropins__/storefront-pdp/runtime.js', 'script');
@@ -166,12 +183,23 @@ async function loadEager(doc) {
     pageType = 'Product';
     preloadFile('/scripts/preact.js', 'script');
     preloadFile('/scripts/htm.js', 'script');
-    preloadFile('/blocks/product-details-custom/ProductDetailsCarousel.js', 'script');
-    preloadFile('/blocks/product-details-custom/ProductDetailsSidebar.js', 'script');
-    preloadFile('/blocks/product-details-custom/ProductDetailsShimmer.js', 'script');
+    preloadFile(
+      '/blocks/product-details-custom/ProductDetailsCarousel.js',
+      'script'
+    );
+    preloadFile(
+      '/blocks/product-details-custom/ProductDetailsSidebar.js',
+      'script'
+    );
+    preloadFile(
+      '/blocks/product-details-custom/ProductDetailsShimmer.js',
+      'script'
+    );
     preloadFile('/blocks/product-details-custom/Icon.js', 'script');
 
-    const blockConfig = readBlockConfig(document.body.querySelector('main .product-details-custom'));
+    const blockConfig = readBlockConfig(
+      document.body.querySelector('main .product-details-custom')
+    );
     const sku = getSkuFromUrl() || blockConfig.sku;
     window.getProductPromise = getProduct(sku);
   } else if (document.body.querySelector('main .product-list-page')) {
@@ -180,12 +208,16 @@ async function loadEager(doc) {
   } else if (document.body.querySelector('main .product-list-page-custom')) {
     // TODO Remove this bracket if not using custom PLP
     pageType = 'Category';
-    const plpBlock = document.body.querySelector('main .product-list-page-custom');
+    const plpBlock = document.body.querySelector(
+      'main .product-list-page-custom'
+    );
     const { category, urlpath } = readBlockConfig(plpBlock);
 
     if (category && urlpath) {
       // eslint-disable-next-line import/no-unresolved, import/no-absolute-path
-      const { preloadCategory } = await import('/blocks/product-list-page-custom/product-list-page-custom.js');
+      const { preloadCategory } = await import(
+        '/blocks/product-list-page-custom/product-list-page-custom.js'
+      );
       preloadCategory({ id: category, urlPath: urlpath });
     }
   } else if (document.body.querySelector('main .commerce-cart')) {
@@ -261,11 +293,15 @@ async function loadLazy(doc) {
   sampleRUM.observe(main.querySelectorAll('picture > img'));
 
   // Implement experimentation preview pill
-  if ((getMetadata('experiment')
-    || Object.keys(getAllMetadata('campaign')).length
-    || Object.keys(getAllMetadata('audience')).length)) {
+  if (
+    getMetadata('experiment') ||
+    Object.keys(getAllMetadata('campaign')).length ||
+    Object.keys(getAllMetadata('audience')).length
+  ) {
     // eslint-disable-next-line import/no-relative-packages
-    const { loadLazy: runLazy } = await import('../plugins/experimentation/src/index.js');
+    const { loadLazy: runLazy } = await import(
+      '../plugins/experimentation/src/index.js'
+    );
     await runLazy(document, { audiences: AUDIENCES }, pluginContext);
   }
 }
@@ -281,11 +317,13 @@ function loadDelayed() {
 
 export async function fetchIndex(indexFile, pageSize = 500) {
   const handleIndex = async (offset) => {
-    const resp = await fetch(`/${indexFile}.json?limit=${pageSize}&offset=${offset}`);
+    const resp = await fetch(
+      `/${indexFile}.json?limit=${pageSize}&offset=${offset}`
+    );
     const json = await resp.json();
 
     const newIndex = {
-      complete: (json.limit + json.offset) === json.total,
+      complete: json.limit + json.offset === json.total,
       offset: json.offset + pageSize,
       promise: null,
       data: [...window.index[indexFile].data, ...json.data],
@@ -313,7 +351,7 @@ export async function fetchIndex(indexFile, pageSize = 500) {
   }
 
   window.index[indexFile].promise = handleIndex(window.index[indexFile].offset);
-  const newIndex = await (window.index[indexFile].promise);
+  const newIndex = await window.index[indexFile].promise;
   window.index[indexFile] = newIndex;
 
   return newIndex;
