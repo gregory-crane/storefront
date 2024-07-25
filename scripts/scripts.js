@@ -38,6 +38,10 @@ const AUDIENCES = {
   // define your custom audiences here as needed
 };
 
+// expose the base URL to help with Adobe Commerce imports.
+const { origin } = new URL(import.meta.url);
+window.hlx.codeBasePath = origin;
+
 /**
  * Gets all the metadata elements that are in the given scope.
  * @param {String} scope The scope/prefix for the metadata
@@ -123,7 +127,8 @@ function buildAutoBlocks(main) {
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
-  //decorateIcons(main);
+  // TODO Fix this error
+  // decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
@@ -272,6 +277,7 @@ async function loadLazy(doc) {
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
+
   if (hash && element) element.scrollIntoView();
 
   await Promise.all([

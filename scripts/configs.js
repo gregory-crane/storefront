@@ -13,7 +13,6 @@ export const calcEnvironment = () => {
   if (href.includes('.hlx.page')) {
     environment = 'stage';
   }
-  environment = 'dev';
 
   const environmentFromConfig = window.sessionStorage.getItem('environment');
   if (
@@ -33,7 +32,7 @@ function buildConfigURL(environment) {
   if (env !== 'prod') {
     fileName = `configs-${env}.json`;
   }
-  const configURL = new URL(`${window.location.origin}/${fileName}`);
+  const configURL = new URL(`${window.hlx.codeBasePath}/${fileName}`);
   return configURL;
 }
 
